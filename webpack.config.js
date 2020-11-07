@@ -1,5 +1,5 @@
 const path = require('path')
-const webpack = require('webpack')
+// const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
@@ -16,7 +16,6 @@ const jsLoaders = () => {
         presets: ['@babel/preset-env'],
       },
     },
-
   ]
   if (isDev) {
     loaders.push('eslint-loader')
@@ -26,12 +25,11 @@ const jsLoaders = () => {
 
 module.exports = {
   context: path.resolve(__dirname, 'src'),
-  mode: 'development,',
+  mode: 'development',
   entry: ['@babel/polyfill', './index.js'],
   output: {
     filename: filename('js'),
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/src/',
+    path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
     extensions: ['.js'],
@@ -40,15 +38,11 @@ module.exports = {
       '@core': path.resolve(__dirname, 'src/core'),
     },
   },
-  // devtool: isDev ? 'source-map' : false,
-  devtool: 'inline-source-map',
+  devtool: isDev ? 'source-map' : false,
   plugins: [
-
-    new webpack.HotModuleReplacementPlugin(),
     new CleanWebpackPlugin(),
     new HTMLWebpackPlugin({
-      title: 'Hot Module Replacement',
-      template: '../index.html',
+      template: 'index.html',
       minify: {
         removeComments: isProd,
         collapseWhitespace: isProd,
@@ -60,7 +54,6 @@ module.exports = {
           from: path.resolve(__dirname, 'src/favicon.ico'),
           to: path.resolve(__dirname, 'dist'),
         },
-
       ],
     }),
     new MiniCssExtractPlugin({
@@ -69,49 +62,31 @@ module.exports = {
 
   ],
   devServer: {
-    contentBase: '/src',
-    //  compress: true,
-    //  historyApiFallback: true,
     port: 3000,
-    // hot: true,
-    // hotOnly: true,
+    hot: isDev,
     open: true,
-    watchOptions: {
-      poll: true,
-    },
-    disableHostCheck: true,
-    inline: true,
-    stats: {
-      normal: true,
-    },
-
   },
 
   module: {
     rules: [
       {
-
         test: /\.s[ac]ss$/i,
         use: [
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              // hmr: isDev,
-              // reloadAll: true
+              hmr: isDev,
+              reloadAll: true,
             },
-
           },
-          // 'style-loader',
           'css-loader',
           'sass-loader',
         ],
       },
       {
-        test: /\.m?js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: jsLoaders(),
-
-
       },
     ],
   },
