@@ -2,6 +2,12 @@ import {ExelComponent} from '@core/ExelComponent';
 
 export class Header extends ExelComponent {
   static className = 'excel__header'
+  constructor($root, options) {
+    super($root, {
+      name: 'Header',
+      ...options
+    });
+  }
   toHTML() {
     return `
       <input type="text" value="Новая таблица" class="input" />
