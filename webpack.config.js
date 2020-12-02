@@ -1,5 +1,4 @@
 const path = require('path')
-// const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
@@ -25,9 +24,18 @@ const jsLoaders = () => {
 }
 
 module.exports = {
-  context: path.resolve(__dirname, 'src'),
   mode: 'development',
-  entry: ['@babel/polyfill', './index.js'],
+  devtool: 'inline-source-map',
+  devServer: {
+    contentBase: './dist',
+    open: true,
+    hot: true
+  },
+  // context: path.resolve(__dirname, 'src'),
+  // entry: ['@babel/polyfill', './index.js'],
+  entry: {
+    app: ['@babel/polyfill', './src/index.js'],
+  },
   output: {
     filename: filename('js'),
     path: path.resolve(__dirname, 'dist'),
@@ -39,15 +47,46 @@ module.exports = {
       '@core': path.resolve(__dirname, 'src/core'),
     },
   },
-  devtool: isDev ? 'source-map' : false,
+  module: {
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // {
+          //   loader: MiniCssExtractPlugin.loader,
+          //   options: {
+          //     // hmr: isDev,
+          //     // reloadAll: true,
+          //   },
+          // },
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              sassOptions: {
+                outputSass: "compressed"
+              }
+            }
+          }
+        ],
+      },
+      {
+        test: /\.js$/,
+        // exclude: /node_modules/,
+        use: jsLoaders(),
+      },
+    ],
+  },
   plugins: [
     new CleanWebpackPlugin(),
     new HTMLWebpackPlugin({
-      template: 'index.html',
-      minify: {
-        removeComments: isProd,
-        collapseWhitespace: isProd,
-      },
+      template: './src/index.html',
+      // minify: {
+      //   removeComments: isProd,
+      //   collapseWhitespace: isProd,
+      // },
     }),
     new CopyPlugin({
       patterns: [
@@ -62,33 +101,4 @@ module.exports = {
     }),
 
   ],
-  devServer: {
-    port: 3000,
-    hot: isDev,
-    open: true,
-  },
-
-  module: {
-    rules: [
-      {
-        test: /\.s[ac]ss$/i,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: isDev,
-              reloadAll: true,
-            },
-          },
-          'css-loader',
-          'sass-loader',
-        ],
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: jsLoaders(),
-      },
-    ],
-  },
 }
