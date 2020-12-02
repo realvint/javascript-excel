@@ -13,7 +13,7 @@ export class DomListener {
       const method = getMethodName(listener)
       if (!this[method]) {
         // eslint-disable-next-line max-len
-        throw new Error(`Method ${method} is not implement in ${this.name} Component`)
+        throw new Error(`Method ${method} is not implement in ${name} Component`)
       }
       this[method] = this[method].bind(this)
       // Тоже самое, что и addEventListener
@@ -28,7 +28,6 @@ export class DomListener {
   }
 }
 
-// input = onInput
 function getMethodName(eventName) {
   return 'on' + capitalize(eventName)
 }
